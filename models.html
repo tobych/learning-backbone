@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="lib/jquery/jquery-1.9.1.js" type="text/javascript"></script>
+<script src="lib/underscore/underscore.js" type="text/javascript"></script>
+<script src="lib/json2/json2.js" type="text/javascript"></script>
+<script src="lib/backbone/backbone-min.js" type="text/javascript"></script>
+</head>
+<body>
+<h2>Models 1</h2>
+<script>
+var Person = Backbone.Model.extend({
+ defaults: {
+  weight: 152,
+  name: "The Invisible Mane"
+ },
+ initialize: function(){
+  this.on("change:name", this.alert_about_name_change);
+ },
+ alert_about_name_change: function(model) {
+   var name;
+   name = model.get("name");
+   console.log("Changed my name to " + name);
+ },
+ make_older: function() {
+  return this.set({ age: this.get('age') + 1 });
+ },
+ validate: function (changedAttributes) {
+  if (changedAttributes.age < 0) {
+   return "You can't be negative years old.";
+  }
+ }
+});
+var thomas = new Person({'name': "Thomas", 'age': 67});
+console.log("Hello");
+// Since 0.9.10 you need to pass 'validate' here
+console.log(thomas.set({ age: -1}, {validate : true}));
+if (thomas.validationError) {
+  console.log("Oops: " + thomas.validationError);
+}
+console.log(thomas.get('age'));
+// thomas.set({ age: 68});
+// thomas.set({ name: 'Tom'});
+</script>
+</body>
+</html> 

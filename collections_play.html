@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="lib/jquery/jquery-1.9.1.js" type="text/javascript"></script>
+<script src="lib/underscore/underscore.js" type="text/javascript"></script>
+<script src="lib/json2/json2.js" type="text/javascript"></script>
+<script src="lib/backbone/backbone-min.js" type="text/javascript"></script>
+</head>
+<body>
+<h2>Album</h2>
+
+<ul id="artists_list">
+ <li>NAME by ARTIST</li>
+</ul>
+
+<!-- TEMPLATES -->
+<script type="text/template" id="album_template">
+ <% album.each(function(song) { %>
+  <li><%= song.get('name') %> by <%= song.get('artist') %></li>
+ <% }); %>
+</script>
+
+<script>
+// MODEL
+
+// Song
+var Song = Backbone.Model.extend({
+ defaults: {
+ name: "Not specified",
+ artist: "Not specified"
+},
+ initialize: function(){
+  console.log("Initializing song " + this.get('name'));
+ }
+});
+
+// Album - collection of Song
+// "A collection is an ordered set (um, a list?) of models." - Davis
+// "Collections are sets of Models." - Osmani
+// No they're NOT! They're LISTs. You can't have duplicates in there.
+var Album = Backbone.Collection.extend({
+ url: "/album/",
+ model: Song
+});
+
+// VIEWS
+
+var AlbumView = Backbone.View.extend({
+ initialize: function() {
+ },
+ render: function(the_album) {
+  var template, context, content;
+  context = {'album': the_album}
+  content = _.template($("#album_template").html(), context);
+  this.$el.html(content); 
+ },
+});
+
+// CREATE SOME DATA
+
+// var song1 = new Song({ name: "How Bizarre", artist: "OMC" });
+// var song2 = new Song({ name: "Sexual Healing", artist: "Marvin Gaye" });
+// var song3 = new Song({ name: "Talk It Over In Bed", artist: "OMC" });
+
+// The list references the objects above. Doesn't copy them.
+
+// Create our album
+var album = new Album();
+
+// Every model as a client ID (cid) assigned before savig
+// There was getByCid, but get() can do this too now
+// console.log(album.get('c1').get('name'));
+
+// ADD SOME LISTENERS TO THE MODEL INSTANCES
+
+album.on("add", function(song) {
+ console.log("Added song '" + song.get('name') + "' to the album");
+});
+
+album.on("sync", function() {
+ console.log("Album was sync'ed");
+});
+
+// album.add(song3);
+// console.log(album.get('c3').get('name'));
+// album.remove(song3);
+// console.log(album.get('c3'));
+// album.remove([song1]);
+
+var dump = function() {
+ console.log("Fetched.");
+ console.log(album.length);
+ // We can use Underscore's chaining stuff.
+ // http://underscorejs.org/#chaining
+ names = album.chain()
+  .map(function(song) {return song.get('name');})
+  .value()
+ console.log(names);
+ // http://liquidmedia.ca/blog/2011/01/backbone-js-part-1/
+ album.each(function(song) {
+  console.log("--> " + song.get("name"));
+ });
+};
+
+// VIEW IS NOT TIED TO MODEL AT ALL YET
+
+// _.templateSettings.variable="rc";
+
+//var song_view = new SongView({ el: $("#artists_list") });
+//song_view.render();
+
+var album_view = new AlbumView({
+  collection: album,
+  el: $('#artists_list')
+});
+
+var album_view = new AlbumView({ el: $("#artists_list") });
+
+// Populate the album from the server
+console.log("Fetching...");
+album.fetch({success: function(album) {
+ dump();
+ album_view.render(album);
+ }
+});
+</script>
+</body>
+</html> 

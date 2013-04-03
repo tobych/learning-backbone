@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="lib/jquery/jquery-1.9.1.js" type="text/javascript"></script>
+<script src="lib/underscore/underscore.js" type="text/javascript"></script>
+<script src="lib/json2/json2.js" type="text/javascript"></script>
+<script src="lib/backbone/backbone-min.js" type="text/javascript"></script>
+</head>
+<body>
+<h2>Views</h2>
+<!-- Underscore, on which Backbone.js depends, includes
+micro-templating functionality. This is a template, identified by its id. -->
+<script type="text/template" id="search_template">
+ <label><!-- = search_label % --></label>
+ <input type="text" id="search_input" />
+ <input type="button" id="search_button" value="Search" />
+</script>
+<!-- This is the element we'll bind as the 'el' property of the view -->
+<div id="search_container"></div>
+<script>
+// This is a prototype thing.
+// We'll bind instances to our search_container element.
+SearchView = Backbone.View.extend({
+ initialize: function() {
+  // This acts as the constructor for the view class
+ },
+ render: function() {
+  // Loads our template into the view's “el” property using jQuery.
+  var template, context;
+  // Compile the template using underscore
+  context = { search_label: "My Search" }; 
+  template = _.template($("#search_template").html(), context);
+  // Load the compiled HTML into the Backbone "el"
+  // KOKO why is it called $el and not el?
+  // el is an HTMLDivElement, but $el is the original jQuery selector you pass it.
+  // let's assume we only use this.$el. i dunno.
+  this.$el.html(template); 
+ },
+ events: {
+ // Events we'll listen for, and what we'll do.
+  "click input[type=button]": "doSearch"
+ },
+ doSearch: function( event ){
+  // Button clicked, you can access the element that was clicked with event.currentTarget
+  alert( "Search for " + $("#search_input").val() );
+ }
+});
+var search_view;
+// This binds the container element.
+// Event listeners can only be attached to child elements of the "el"
+// property.
+search_view = new SearchView({ el: $("#search_container") });
+search_view.render();
+</script>
+</body>
+</html> 

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="lib/jquery/jquery-1.9.1.js" type="text/javascript"></script>
+<script src="lib/underscore/underscore.js" type="text/javascript"></script>
+<script src="lib/json2/json2.js" type="text/javascript"></script>
+<script src="lib/backbone/backbone-min.js" type="text/javascript"></script>
+</head>
+<body>
+<h2>Views Play</h2>
+<!-- I want to click on the button and have it add a person to the list. -->
+<!-- how do I iterate through a list of people here? -->
+<script type="text/template" id="person_template">
+ <li><%= name %> is a real person.</li>
+</script>
+
+<!-- This is the element we'll bind as the 'el' property of the view -->
+<ul id="people_list"></ul>
+
+<!-- if I want a click on here to add a person, how do I do that? -->
+<input type="button" id="add_button" value="Add a Person" />
+
+<script>
+PersonView = Backbone.View.extend({
+ initialize: function() {
+ },
+ render: function() {
+  var template, context;
+  context = {name: "Toby"};
+  template = _.template($("#person_template").html(), context);
+  this.$el.html(template); 
+ },
+});
+var person_view;
+person_view = new PersonView({ el: $("#people_list") });
+person_view.render();
+</script>
+</body>
+</html> 
